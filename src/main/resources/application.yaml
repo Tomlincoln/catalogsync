@@ -8,7 +8,7 @@ spring:
     default-domain: catalogsync
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: create
     properties:
       hibernate:
         cache:
