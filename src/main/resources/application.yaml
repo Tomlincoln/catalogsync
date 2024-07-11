@@ -1,0 +1,23 @@
+spring:
+  application:
+    name: catalogsync
+  datasource:
+    url: "jdbc:sqlite:custom.dat"
+    driver-class-name: org.sqlite.JDBC
+  jmx:
+    default-domain: catalogsync
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        cache:
+          use_second_level_cache: false
+          provider_class: org.hibernate.cache.NoCacheProvider
+        connection:
+          autocommit: true
+        dialect: "org.hibernate.dialect.SQLiteDialect"
+        enable-lazy-load-no-trans: true
+        jdbc:
+          batch-size: 100
+        show_sql: true
