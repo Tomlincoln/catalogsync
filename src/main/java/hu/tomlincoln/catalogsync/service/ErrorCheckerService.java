@@ -1,6 +1,7 @@
 package hu.tomlincoln.catalogsync.service;
 
 import hu.tomlincoln.catalogsync.domain.AgeGroup;
+import hu.tomlincoln.catalogsync.domain.Product;
 import hu.tomlincoln.catalogsync.domain.ProductAvailability;
 import hu.tomlincoln.catalogsync.domain.ProductCondition;
 import hu.tomlincoln.catalogsync.dto.InvalidProductDTO;
@@ -18,74 +19,69 @@ import java.util.stream.IntStream;
 @Service
 public class ErrorCheckerService {
 
-    private static final Pattern CATEGORY_PATTERN = Pattern.compile("^([0-9]*|[A-Za-z])$");
+    private static final Pattern CATEGORY_PATTERN = Pattern.compile("^\\d+$|^[^\\d]+$");
 
     public boolean hasError(String[] product, List<InvalidProductDTO> invalidProducts) {
-        IntStream.range(0, product.length).forEach(i -> {
-            if (product[i].startsWith("\"")) {
-                product[i] = product[i].substring(1, product[i].length() - 1);
-            }
-            if (product[i].endsWith("\"")) {
-                product[i] = product[i].substring(0, product[i].length() - 2);
-            }
-        });
+        String[] cleanedProduct = Product.cleanProductArrayFromParenthesis(product);
+
         // We need to handle enums since they may have space in them.
-        IntStream.of(3, 4, 10).forEach(i -> product[i] = product[i].replace(" ", "_"));
+        IntStream.of(3, 4, 10).forEach(i -> cleanedProduct[i] = cleanedProduct[i].replace(" ", "_"));
 
         // Also handle default values where needed
-        product[4] = !product[4].isEmpty() ? product[4] : "NEW";
-        product[10] = !product[10].isEmpty() ? product[10] : null;
+        cleanedProduct[4] = !cleanedProduct[4].isEmpty() ? cleanedProduct[4] : "NEW";
+        cleanedProduct[10] = !cleanedProduct[10].isEmpty() ? cleanedProduct[10] : "";
 
-        if (product.length != 12) {
-            addToInvalidProducts(invalidProducts, product, null);
+        if (cleanedProduct.length != 12) {
+            addToInvalidProducts(invalidProducts, cleanedProduct, null);
             return true;
         }
-        if (product[0].length() > 50) {
-            addToInvalidProducts(invalidProducts, product, "id");
+        if (cleanedProduct[0].length() > 50) {
+            addToInvalidProducts(invalidProducts, cleanedProduct, "id");
             return true;
         }
-        if (product[1].length() > 100) {
-            addToInvalidProducts(invalidProducts, product, "title");
+        if (cleanedProduct[1].length() > 100) {
+            addToInvalidProducts(invalidProducts, cleanedProduct, "title");
             return true;
         }
-        if (product[2].length() > 5000) {
-            addToInvalidProducts(invalidProducts, product, "description");
+        if (cleanedProduct[2].length() > 5000) {
+            addToInvalidProducts(invalidProducts, cleanedProduct, "description");
             return true;
         }
-        if (Arrays.stream(ProductAvailability.values()).map(ProductAvailability::name).noneMatch(s -> s.equalsIgnoreCase(product[3]))) {
-            addToInvalidProducts(invalidProducts, product, "availability");
+        if (Arrays.stream(ProductAvailability.values()).map(ProductAvailability::name).noneMatch(s -> s.equalsIgnoreCase(cleanedProduct[3]))) {
+            addToInvalidProducts(invalidProducts, cleanedProduct, "availability");
             return true;
         }
-        if (Arrays.stream(ProductCondition.values()).map(ProductCondition::name).noneMatch(s -> s.equalsIgnoreCase(product[4]))) {
-            addToInvalidProducts(invalidProducts, product, "condition");
+        if (Arrays.stream(ProductCondition.values()).map(ProductCondition::name).noneMatch(s -> s.equalsIgnoreCase(cleanedProduct[4]))) {
+            addToInvalidProducts(invalidProducts, cleanedProduct, "condition");
             return true;
         }
-        if (hasPriceError(5, product)) {
-            addToInvalidProducts(invalidProducts, product, "price");
+        if (hasPriceError(5, cleanedProduct)) {
+            addToInvalidProducts(invalidProducts, cleanedProduct, "price");
             return true;
         }
-        if (hasPriceError(6, product)) {
-            addToInvalidProducts(invalidProducts, product, "sale_price");
+        if (hasPriceError(6, cleanedProduct)) {
+            addToInvalidProducts(invalidProducts, cleanedProduct, "sale_price");
             return true;
         }
-        if (hasLinkError(product, 7)) {
-            addToInvalidProducts(invalidProducts, product, "link");
+        if (hasLinkError(cleanedProduct, 7)) {
+            addToInvalidProducts(invalidProducts, cleanedProduct, "link");
             return true;
         }
-        if (product[8].length() > 50) {
-            addToInvalidProducts(invalidProducts, product, "brand");
+        if (cleanedProduct[8].length() > 50) {
+            addToInvalidProducts(invalidProducts, cleanedProduct, "brand");
             return true;
         }
         if (hasLinkError(product, 9)) {
-            addToInvalidProducts(invalidProducts, product, "image_link");
+            addToInvalidProducts(invalidProducts, cleanedProduct, "image_link");
             return true;
         }
-        if (product[10] != null && (Arrays.stream(AgeGroup.values()).map(Enum::name).noneMatch(s -> s.equalsIgnoreCase(product[10])))) {
-            addToInvalidProducts(invalidProducts, product, "age group");
+        if (Arrays.stream(AgeGroup.values()).map(Enum::name)
+                .noneMatch(s -> s.equalsIgnoreCase("".equals(cleanedProduct[10]) ? "NOT_SPECIFIED" : cleanedProduct[10]))) {
+            addToInvalidProducts(invalidProducts, cleanedProduct, "age_group");
             return true;
         }
-        if (!CATEGORY_PATTERN.matcher(product[11]).matches()) {
-            addToInvalidProducts(invalidProducts, product, "google product category");
+        if (!CATEGORY_PATTERN.matcher(cleanedProduct[11]).matches()) {
+            addToInvalidProducts(invalidProducts, cleanedProduct, "google_product_category");
             return true;
         }
         return false;
@@ -109,7 +105,7 @@ public class ErrorCheckerService {
 
     private boolean hasLinkError(String[] product, int index) {
         try {
-            if (!product[index].startsWith("http") || !product[index].startsWith("https")) {
+            if (!(product[index].startsWith("http") || product[index].startsWith("https"))) {
                 throw new IllegalArgumentException("not a (http or https) link");
             }
             // Syntax check

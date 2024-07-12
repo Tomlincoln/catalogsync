@@ -1,0 +1,14 @@
+header line (skipped, so no matter what is this)
+12345ABCDE	Some Title	Some description which is longer	in stock	new	1H00 H1F	100 HUF	https://www.asdasd.hu/valami.html	Some Brand	https://www.asdasd.hu/valami2.jpg	ADULT	12345
+22345ABCDE	Some Title	Some description which is longer	in stock	new	1H00 H1F	100 HUF	https://www.asdasd.hu/valami.html	Some Brand	https://www.asdasd.hu/valami2.jpg	ADULT	12345
+32345ABCDE	Some Title	Some description which is longer	in stock	new	1H00 H1F	100 HUF	https://www.asdasd.hu/valami.html	Some Brand	https://www.asdasd.hu/valami2.jpg	ADULT	12345
+42345ABCDE	Some Title	Some description which is longer	in stock	new	1H00 H1F	100 HUF	https://www.asdasd.hu/valami.html	Some Brand	https://www.asdasd.hu/valami2.jpg	ADULT	12345
+52345ABCDE	Some Title	Some description which is longer	in stock	new	1H00 H1F	100 HUF	https://www.asdasd.hu/valami.html	Some Brand	https://www.asdasd.hu/valami2.jpg	ADULT	12345
+62345ABCDE	Some Title	Some description which is longer	in stock	new	1H00 H1F	100 HUF	https://www.asdasd.hu/valami.html	Some Brand	https://www.asdasd.hu/valami2.jpg	ADULT	12345
+72345ABCDE	Some Title	Some description which is longer	in stock	new	1H00 H1F	100 HUF	https://www.asdasd.hu/valami.html	Some Brand	https://www.asdasd.hu/valami2.jpg	ADULT	12345
+82345ABCDE	Some Title	Some description which is longer	in stock	new	1H00 H1F	100 HUF	https://www.asdasd.hu/valami.html	Some Brand	https://www.asdasd.hu/valami2.jpg	ADULT	12345
+92345ABCDE	Some Title	Some description which is longer	in stock	new	1H00 H1F	100 HUF	https://www.asdasd.hu/valami.html	Some Brand	https://www.asdasd.hu/valami2.jpg	ADULT	12345
+102345ABCDE	Some Title	Some description which is longer	in stock	new	1H00 H1F	100 HUF	https://www.asdasd.hu/valami.html	Some Brand	https://www.asdasd.hu/valami2.jpg	ADULT	12345
+112345ABCDE	Some Title	Some description which is longer	in stock	new	1H00 H1F	100 HUF	https://www.asdasd.hu/valami.html	Some Brand	https://www.asdasd.hu/valami2.jpg	ADULT	12345
+122345ABCDE	Some Title	Some description which is longer	in stock	new	1H00 H1F	100 HUF	https://www.asdasd.hu/valami.html	Some Brand	https://www.asdasd.hu/valami2.jpg	ADULT	12345
+13345ABCDE	Some Title	Some description which is longer	in stock	new	1H00 H1F	100 HUF	https://www.asdasd.hu/valami.html	Some Brand	https://www.asdasd.hu/valami2.jpg	ADULT	12345

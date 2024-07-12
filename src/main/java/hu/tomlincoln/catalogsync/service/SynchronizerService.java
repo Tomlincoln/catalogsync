@@ -27,7 +27,8 @@ public class SynchronizerService {
     private final IdProviderService idProviderService;
     private final ProductProviderService productProviderService;
 
-    public SynchronizerService(ProductRepository productRepository, ErrorCheckerService errorCheckerService, IdProviderService idProviderService, ProductProviderService productProviderService) {
+    public SynchronizerService(ProductRepository productRepository, ErrorCheckerService errorCheckerService,
+                               IdProviderService idProviderService, ProductProviderService productProviderService) {
         this.productRepository = productRepository;
         this.errorCheckerService = errorCheckerService;
         this.idProviderService = idProviderService;
@@ -48,11 +49,12 @@ public class SynchronizerService {
         // Skip 1 is the header
         List<String[]> splitLines = lines.stream().skip(1).map(s -> s.split("\\t")).collect(Collectors.toList());
         HashSet<String[]> validatedProducts = new HashSet<>();
-        for (String[] product : splitLines) {
-            if (errorCheckerService.hasError(product, invalidProducts)) {
+        for (String[] productArray : splitLines) {
+            String[] cleanedProductArray = Product.cleanProductArrayFromParenthesis(productArray);
+            if (errorCheckerService.hasError(cleanedProductArray, invalidProducts)) {
                 skipped++;
             } else {
-                validatedProducts.add(product);
+                validatedProducts.add(cleanedProductArray);
             }
         }
 

@@ -1,0 +1,1 @@
+12345ABCDE	Some Title	Some description which is longer	in stock	new	100 HUF	100 HUF	https://www.asdasd.hu/valami.html	Some Brand	https://www.asdasd.hu/valami2.jpg	ADULT	12345

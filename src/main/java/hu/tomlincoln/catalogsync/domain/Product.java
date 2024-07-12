@@ -1,22 +1,26 @@
 package hu.tomlincoln.catalogsync.domain;
 
 import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import javax.persistence.AttributeOverride;
 import javax.persistence.AttributeOverrides;
 import javax.persistence.Column;
 import javax.persistence.Embedded;
 import javax.persistence.Entity;
+import javax.persistence.EntityListeners;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.Id;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.Currency;
 import java.util.Objects;
 import java.util.Optional;
 
 @Entity
+@EntityListeners(AuditingEntityListener.class)
 public class Product {
 
     @Id
@@ -180,29 +184,44 @@ public class Product {
 
     public static Product fromStringArray(String[] array, Product product) {
         Product newOrExistingProduct = Optional.ofNullable(product).orElseGet(Product::new);
-        newOrExistingProduct.setId(array[0]);
-        newOrExistingProduct.setTitle(array[1]);
-        newOrExistingProduct.setDescription(array[2]);
-        newOrExistingProduct.setAvailability(ProductAvailability.valueOf(array[3].toUpperCase()));
-        newOrExistingProduct.setCondition(ProductCondition.valueOf(array[4].toUpperCase()));
+        String[] cleanArray = Product.cleanProductArrayFromParenthesis(array);
+        newOrExistingProduct.setId(cleanArray[0]);
+        newOrExistingProduct.setTitle(cleanArray[1]);
+        newOrExistingProduct.setDescription(cleanArray[2]);
+        newOrExistingProduct.setAvailability(ProductAvailability.valueOf(cleanArray[3].toUpperCase().replace(" ", "_")));
+        newOrExistingProduct.setCondition(ProductCondition.valueOf(cleanArray[4].toUpperCase().replace(" ", "_")));
         Price currentPrice = Optional.ofNullable(newOrExistingProduct.getPrice()).orElseGet(Price::new);
-        currentPrice.setValue(new BigDecimal(array[5].split(" ")[0]));
-        currentPrice.setCurrency(Currency.getInstance(array[5].split(" ")[1]));
+        currentPrice.setValue(new BigDecimal(cleanArray[5].split(" ")[0]));
+        currentPrice.setCurrency(Currency.getInstance(cleanArray[5].split(" ")[1]));
         newOrExistingProduct.setPrice(currentPrice);
         Price currentSalePrice = newOrExistingProduct.getPrice();
-        currentSalePrice.setValue(new BigDecimal(array[5].split(" ")[0]));
-        currentSalePrice.setCurrency(Currency.getInstance(array[5].split(" ")[1]));
+        currentSalePrice.setValue(new BigDecimal(cleanArray[5].split(" ")[0]));
+        currentSalePrice.setCurrency(Currency.getInstance(cleanArray[5].split(" ")[1]));
         newOrExistingProduct.setSalePrice(currentSalePrice);
-        newOrExistingProduct.setLink(array[7]);
-        newOrExistingProduct.setBrand(array[8]);
-        newOrExistingProduct.setImageLink(array[9]);
+        newOrExistingProduct.setLink(cleanArray[7]);
+        newOrExistingProduct.setBrand(cleanArray[8]);
+        newOrExistingProduct.setImageLink(cleanArray[9]);
         try {
-            newOrExistingProduct.setAgeGroup(AgeGroup.valueOf(Optional.ofNullable(array[10]).orElseGet(() -> String.valueOf(AgeGroup.NOT_SPECIFIED)).toUpperCase()));
+            newOrExistingProduct.setAgeGroup(AgeGroup.valueOf(Optional.ofNullable(cleanArray[10])
+                    .orElseGet(() -> String.valueOf(AgeGroup.NOT_SPECIFIED)).toUpperCase().replace(" ", "_")));
         } catch (IllegalArgumentException e) {
             newOrExistingProduct.setAgeGroup(AgeGroup.NOT_SPECIFIED);
         }
-        newOrExistingProduct.setGoogleProductCategory(array[11]);
+        newOrExistingProduct.setGoogleProductCategory(cleanArray[11]);
         return newOrExistingProduct;
+    }
+
+    public static String[] cleanProductArrayFromParenthesis(String[] product) {
+        return Arrays.stream(product)
+                .map(string -> Objects.requireNonNullElse(string, "")).map(s -> {
+                    if (s.startsWith("\"")) {
+                        s = s.substring(1);
+                    }
+                    if (s.endsWith("\"")) {
+                        s = s.substring(0, s.length() - 1);
+                    }
+                    return s;
+                }).toArray(String[]::new);
     }
 
 

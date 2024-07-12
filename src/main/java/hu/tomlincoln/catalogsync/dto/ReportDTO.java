@@ -3,6 +3,7 @@ package hu.tomlincoln.catalogsync.dto;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 public class ReportDTO {
 
@@ -100,4 +101,18 @@ public class ReportDTO {
         }
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof ReportDTO)) return false;
+        ReportDTO reportDTO = (ReportDTO) o;
+        return added == reportDTO.added && updated == reportDTO.updated
+                && notChanged == reportDTO.notChanged && deleted == reportDTO.deleted
+                && skipped == reportDTO.skipped && Objects.equals(invalidProducts, reportDTO.invalidProducts);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(added, updated, notChanged, deleted, skipped, invalidProducts);
+    }
 }

@@ -29,12 +29,10 @@ public class ProductProviderService {
 
     public Set<Product> getProductsToBeUpdated(Set<String> idsToBeUpdated, Set<String[]> validatedProducts) {
         return productRepository.getAllWhereExists(idsToBeUpdated).stream()
-                .filter(p -> p.equals(validatedProducts.stream()
+                .filter(p -> !validatedProducts.stream()
                         .filter(vp -> vp[0].equals(p.getId()))
                         .map(Product::fromStringArray)
-                        .filter(vp -> !vp.equals(p))
-                        .findFirst()
-                        .orElseGet(Product::new)))
+                        .collect(Collectors.toSet()).contains(p))
                 .collect(Collectors.toSet());
     }
 
