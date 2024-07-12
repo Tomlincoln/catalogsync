@@ -23,8 +23,8 @@ public class InvalidProductDTO {
         private String productString;
         private String errorMessage;
 
-        public Builder withProductString(String productString) {
-            this.productString = productString;
+        public Builder withProductString(String[] product) {
+            this.productString = String.join("\t", product);
             return this;
         }
 

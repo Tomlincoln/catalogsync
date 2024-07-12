@@ -10,29 +10,33 @@ import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.Id;
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.Currency;
+import java.util.Objects;
+import java.util.Optional;
 
 @Entity
 public class Product {
 
     @Id
-    @Column(length = 50)
+    @Column(length = 50, nullable = false)
     private String id;
 
-    @Column(length = 150)
+    @Column(length = 150, nullable = false)
     private String title;
 
-    @Column(length = 5000)
+    @Column(length = 5000, nullable = false)
     private String description;
 
     @Enumerated(EnumType.STRING)
     //SQLite does not support "ENUM" type definition, so we at least restrict length
-    @Column(length = 15)
+    @Column(length = 15, nullable = false)
     private ProductAvailability availability;
 
     @Enumerated(EnumType.STRING)
     //SQLite does not support "ENUM" type definition, so we at least restrict length
-    @Column(length = 11)
+    @Column(length = 11, nullable = false)
     private ProductCondition condition;
 
     @Embedded
@@ -52,10 +56,10 @@ public class Product {
     @Column(length = 70)
     private String brand;
 
-    @Column(length = 5000)
+    @Column(length = 5000, nullable = false)
     private String link;
 
-    @Column(length = 5000)
+    @Column(length = 5000, nullable = false)
     private String imageLink;
 
     @Enumerated(EnumType.STRING)
@@ -168,5 +172,61 @@ public class Product {
 
     public LocalDateTime getCreatedAt() {
         return createdAt;
+    }
+
+    public static Product fromStringArray(String[] array) {
+        return fromStringArray(array, null);
+    }
+
+    public static Product fromStringArray(String[] array, Product product) {
+        Product newOrExistingProduct = Optional.ofNullable(product).orElseGet(Product::new);
+        newOrExistingProduct.setId(array[0]);
+        newOrExistingProduct.setTitle(array[1]);
+        newOrExistingProduct.setDescription(array[2]);
+        newOrExistingProduct.setAvailability(ProductAvailability.valueOf(array[3].toUpperCase()));
+        newOrExistingProduct.setCondition(ProductCondition.valueOf(array[4].toUpperCase()));
+        Price currentPrice = Optional.ofNullable(newOrExistingProduct.getPrice()).orElseGet(Price::new);
+        currentPrice.setValue(new BigDecimal(array[5].split(" ")[0]));
+        currentPrice.setCurrency(Currency.getInstance(array[5].split(" ")[1]));
+        newOrExistingProduct.setPrice(currentPrice);
+        Price currentSalePrice = newOrExistingProduct.getPrice();
+        currentSalePrice.setValue(new BigDecimal(array[5].split(" ")[0]));
+        currentSalePrice.setCurrency(Currency.getInstance(array[5].split(" ")[1]));
+        newOrExistingProduct.setSalePrice(currentSalePrice);
+        newOrExistingProduct.setLink(array[7]);
+        newOrExistingProduct.setBrand(array[8]);
+        newOrExistingProduct.setImageLink(array[9]);
+        try {
+            newOrExistingProduct.setAgeGroup(AgeGroup.valueOf(Optional.ofNullable(array[10]).orElseGet(() -> String.valueOf(AgeGroup.NOT_SPECIFIED)).toUpperCase()));
+        } catch (IllegalArgumentException e) {
+            newOrExistingProduct.setAgeGroup(AgeGroup.NOT_SPECIFIED);
+        }
+        newOrExistingProduct.setGoogleProductCategory(array[11]);
+        return newOrExistingProduct;
+    }
+
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Product)) return false;
+        Product product = (Product) o;
+        return Objects.equals(id, product.id) &&
+                Objects.equals(title, product.title) &&
+                Objects.equals(description, product.description) &&
+                availability == product.availability &&
+                condition == product.condition &&
+                Objects.equals(price, product.price) &&
+                Objects.equals(salePrice, product.salePrice) &&
+                Objects.equals(brand, product.brand) &&
+                Objects.equals(link, product.link) &&
+                Objects.equals(imageLink, product.imageLink) &&
+                ageGroup == product.ageGroup &&
+                Objects.equals(googleProductCategory, product.googleProductCategory);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, title, description, availability, condition, price, salePrice, brand, link, imageLink, ageGroup, googleProductCategory);
     }
 }

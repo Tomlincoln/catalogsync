@@ -6,6 +6,7 @@ public enum AgeGroup {
     INFANT,
     TODDLER,
     KIDS,
-    ADULT
+    ADULT,
+    NOT_SPECIFIED
 
 }

@@ -46,6 +46,17 @@ public class ReportDTO {
         return invalidProducts;
     }
 
+    public static ReportDTO getEmptyReport() {
+        return new ReportDTO.Builder()
+                .withAdded(0)
+                .withUpdated(0)
+                .withNotChanged(0)
+                .withDeleted(0)
+                .withSkipped(0)
+                .withInvalidProducts(Collections.emptyList())
+                .build();
+    }
+
     public static class Builder {
         private long added;
         private long updated;
@@ -79,7 +90,7 @@ public class ReportDTO {
             return this;
         }
 
-        public Builder withInvalidProduct(Collection<InvalidProductDTO> invalidProducts) {
+        public Builder withInvalidProducts(Collection<InvalidProductDTO> invalidProducts) {
             this.invalidProducts.addAll(invalidProducts);
             return this;
         }
